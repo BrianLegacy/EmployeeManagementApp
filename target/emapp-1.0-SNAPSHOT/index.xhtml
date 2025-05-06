@@ -1,0 +1,123 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <h:head>
+        <title>Employee Management System</title>
+    </h:head>
+    <h:body>
+        <h:form id="form">
+            <p:growl id="messages" showDetail="true"/>
+
+            <p:panel header="Employee List" style="margin-bottom: 20px;">
+                <p:dataTable id="employeesTable" var="emp" value="#{employeeController.employees}" 
+                             selection="#{employeeController.selectedEmployee}" selectionMode="single"
+                             rowKey="#{emp.id}" style="margin-bottom: 10px;">
+                    <p:ajax event="rowSelect" update="@form:deleteBtn" />
+                    <p:ajax event="rowUnselect" update="@form:deleteBtn" />
+                    <p:column headerText="ID">
+                        <h:outputText value="#{emp.id}"/>
+                    </p:column>
+                    <p:column headerText="First Name">
+                        <h:outputText value="#{emp.firstName}"/>
+                    </p:column>
+                    <p:column headerText="Last Name">
+                        <h:outputText value="#{emp.lastName}"/>
+                    </p:column>
+                    <p:column headerText="Email">
+                        <h:outputText value="#{emp.email}"/>
+                    </p:column>
+                    <p:column headerText="Department">
+                        <h:outputText value="#{emp.department}"/>
+                    </p:column>
+                    <p:column headerText="Salary">
+                        <h:outputText value="#{emp.salary}">
+                            <f:convertNumber type="currency" currencySymbol="$"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column style="width: 100px; text-align: center">
+                        <p:commandButton value="Edit" 
+                                         oncomplete="PF('editDialog').show()"
+                                         update=":editForm"/>
+                    </p:column>
+                </p:dataTable>
+
+                <p:commandButton value="Add Employee" 
+                                 oncomplete="PF('addDialog').show()" 
+                                 styleClass="ui-button-success"/>
+                <p:commandButton id="deleteBtn" 
+                                 value="Delete Selected" 
+                                 action="#{employeeController.deleteEmployee}" 
+                                 update=":form:messages :form:employeesTable"
+                                 disabled="#{employeeController.selectedEmployee == null}"
+                                 styleClass="ui-button-danger"/>
+            </p:panel>
+        </h:form>
+
+
+
+        <p:dialog id="addDialog" widgetVar="addDialog" header="Add Employee" modal="true" resizable="false">
+            <h:form>
+                <p:panelGrid columns="2" style="margin: 0 auto;">
+                    <p:outputLabel for="firstName" value="First Name:"/>
+                    <p:inputText id="firstName" value="#{employeeController.newEmployee.firstName}" required="true"/>
+
+                    <p:outputLabel for="lastName" value="Last Name:"/>
+                    <p:inputText id="lastName" value="#{employeeController.newEmployee.lastName}" required="true"/>
+
+                    <p:outputLabel for="email" value="Email:"/>
+                    <p:inputText id="email" value="#{employeeController.newEmployee.email}" required="true"/>
+
+                    <p:outputLabel for="department" value="Department:"/>
+                    <p:inputText id="department" value="#{employeeController.newEmployee.department}"/>
+
+                    <p:outputLabel for="salary" value="Salary:"/>
+                    <p:inputNumber id="salary" value="#{employeeController.newEmployee.salary}" required="true"/>
+                </p:panelGrid>
+
+                <p:commandButton value="Save" 
+                                 action="#{employeeController.addEmployee}" 
+                                 update=":form:messages,:form:employeesTable" 
+                                 oncomplete="PF('addDialog').hide()"/>
+                <p:commandButton value="Cancel" 
+                                 onclick="PF('addDialog').hide()" 
+                                 immediate="true"/>
+            </h:form>
+        </p:dialog>
+
+        
+        <p:dialog id="editDialog" widgetVar="editDialog" header="Edit Employee" modal="true" resizable="false">
+            <h:form id="editForm">
+                <p:panelGrid columns="2" style="margin: 0 auto;">
+                    <p:outputLabel for="editId" value="ID:"/>
+                    <p:inputText id="editId" value="#{employeeController.selectedEmployee.id}" disabled="true"/>
+
+                    <p:outputLabel for="editFirstName" value="First Name:"/>
+                    <p:inputText id="editFirstName" value="#{employeeController.selectedEmployee.firstName}" required="true"/>
+
+                    <p:outputLabel for="editLastName" value="Last Name:"/>
+                    <p:inputText id="editLastName" value="#{employeeController.selectedEmployee.lastName}" required="true"/>
+
+                    <p:outputLabel for="editEmail" value="Email:"/>
+                    <p:inputText id="editEmail" value="#{employeeController.selectedEmployee.email}" required="true"/>
+
+                    <p:outputLabel for="editDepartment" value="Department:"/>
+                    <p:inputText id="editDepartment" value="#{employeeController.selectedEmployee.department}"/>
+
+                    <p:outputLabel for="editSalary" value="Salary:"/>
+                    <p:inputNumber id="editSalary" value="#{employeeController.selectedEmployee.salary}" required="true"/>
+                </p:panelGrid>
+
+                <p:commandButton value="Update" 
+                                 action="#{employeeController.updateEmployee}" 
+                                 update=":form:messages,:form:employeesTable"
+                                 oncomplete="if(!args.validationFailed) PF('editDialog').hide()"/>
+                <p:commandButton value="Cancel" 
+                                 onclick="PF('editDialog').hide()" 
+                                 immediate="true"/>
+            </h:form>
+        </p:dialog>
+    </h:body>
+</html>
